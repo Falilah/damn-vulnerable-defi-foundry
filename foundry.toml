@@ -1,5 +1,5 @@
 [profile.default]
-verbosity = 2
+verbosity = 4
 
 ## set only when the `hardhat` profile is selected
 [profile.hardhat]
